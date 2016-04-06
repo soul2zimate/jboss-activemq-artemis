@@ -83,6 +83,11 @@ public class NullStorageManager implements StorageManager {
 
    }
 
+   @Override
+   public void waitReplicaSync() throws Exception {
+      // NOOP
+   }
+
    private static final OperationContext dummyContext = new OperationContext() {
 
       @Override

@@ -263,6 +263,11 @@ public class TransactionImplTest extends ActiveMQTestBase {
       }
 
       @Override
+      public void waitReplicaSync() throws Exception {
+
+      }
+
+      @Override
       public void beforePageRead() throws Exception {
 
       }
