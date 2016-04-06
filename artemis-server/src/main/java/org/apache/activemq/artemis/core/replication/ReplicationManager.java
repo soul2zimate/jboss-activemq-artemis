@@ -581,11 +581,14 @@ public final class ReplicationManager implements ActiveMQComponent, ReadyListene
     */
    public void sendSynchronizationDone(String nodeID, long initialReplicationSyncTimeout) {
       if (enabled) {
+
+         ActiveMQServerLogger.LOGGER.info("sending Sycnrhonization towards " + nodeID);
          synchronizationIsFinishedAcknowledgement.countUp();
          sendReplicatePacket(new ReplicationStartSyncMessage(nodeID));
          try {
             if (!synchronizationIsFinishedAcknowledgement.await(initialReplicationSyncTimeout)) {
-               throw ActiveMQMessageBundle.BUNDLE.replicationSynchronizationTimeout(initialReplicationSyncTimeout);
+               ActiveMQServerLogger.LOGGER.warn("Synchronization finished didn't return from target server, we will just give up");
+               synchronizationIsFinishedAcknowledgement.countDown();
             }
          }
          catch (InterruptedException e) {

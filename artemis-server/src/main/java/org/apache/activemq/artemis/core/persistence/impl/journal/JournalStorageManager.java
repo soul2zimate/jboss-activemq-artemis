@@ -422,6 +422,7 @@ public class JournalStorageManager implements StorageManager {
          }
       }
       catch (Exception e) {
+         ActiveMQServerLogger.LOGGER.warn(e.getMessage(), e);
          stopReplication();
          throw e;
       }
