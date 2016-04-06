@@ -346,17 +346,23 @@ public final class ReplicationManager implements ActiveMQComponent, ReadyListene
                try {
                   writable.set(false);
                   //don't wait for ever as this may hang tests etc, we've probably been closed anyway
-                  long now = System.currentTimeMillis();
-                  long deadline = now + 5000;
-                  while (!writable.get() && now < deadline)  {
-                     replicationLock.wait(deadline - now);
-                     now = System.currentTimeMillis();
+//                  long now = System.currentTimeMillis();
+//                  long deadline = now + 5000;
+                  while (!writable.get()) {// && now < deadline)  {
+                     ActiveMQServerLogger.LOGGER.info("##############################");
+                     ActiveMQServerLogger.LOGGER.info("WAITING...");
+                     ActiveMQServerLogger.LOGGER.info("##############################");
+                     replicationLock.wait();//deadline - now);
+//                     now = System.currentTimeMillis();
                   }
                }
                catch (InterruptedException e) {
                   throw new ActiveMQInterruptedException(e);
                }
             }
+            ActiveMQServerLogger.LOGGER.info("##############################");
+            ActiveMQServerLogger.LOGGER.info("DONE WAITING.");
+            ActiveMQServerLogger.LOGGER.info("##############################");
             replicatingChannel.send(packet);
          }
          else {
