@@ -372,7 +372,7 @@ public class QueueControlImpl extends AbstractControl implements QueueControl {
          Filter filter = FilterImpl.createFilter(filterStr);
          List<Map<String, Object>> messages = new ArrayList<Map<String, Object>>();
          queue.flushExecutor();
-         LinkedListIterator<MessageReference> iterator = queue.totalIterator();
+         LinkedListIterator<MessageReference> iterator = queue.browserIterator();
          try {
             while (iterator.hasNext()) {
                MessageReference ref = iterator.next();
@@ -414,7 +414,7 @@ public class QueueControlImpl extends AbstractControl implements QueueControl {
       try {
          List<Map<String, Object>> messages = new ArrayList<Map<String, Object>>();
          queue.flushExecutor();
-         LinkedListIterator<MessageReference> iterator = queue.totalIterator();
+         LinkedListIterator<MessageReference> iterator = queue.browserIterator();
          try {
             // returns just the first, as it's the first only
             if (iterator.hasNext()) {
@@ -469,7 +469,7 @@ public class QueueControlImpl extends AbstractControl implements QueueControl {
             return getMessageCount();
          }
          else {
-            LinkedListIterator<MessageReference> iterator = queue.totalIterator();
+            LinkedListIterator<MessageReference> iterator = queue.browserIterator();
             try {
                int count = 0;
                while (iterator.hasNext()) {

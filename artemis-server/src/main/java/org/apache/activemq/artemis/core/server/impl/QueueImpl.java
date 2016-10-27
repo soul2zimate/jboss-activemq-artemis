@@ -881,8 +881,8 @@ public class QueueImpl implements Queue {
    }
 
    @Override
-   public TotalQueueIterator totalIterator() {
-      return new TotalQueueIterator();
+   public QueueBrowserIterator browserIterator() {
+      return new QueueBrowserIterator();
    }
 
    @Override
@@ -2896,17 +2896,23 @@ public class QueueImpl implements Queue {
 
    //Readonly (no remove) iterator over the messages in the queue, in order of
    //paging store, intermediateMessageReferences and MessageReferences
-   private class TotalQueueIterator implements LinkedListIterator<MessageReference> {
+   private class QueueBrowserIterator implements LinkedListIterator<MessageReference> {
 
-      LinkedListIterator<PagedReference> pageIter = null;
+      LinkedListIterator<PagedReference> pagingIterator = null;
       LinkedListIterator<MessageReference> messagesIterator = null;
+
+      private LinkedListIterator<PagedReference> getPagingIterator() {
+         if (pagingIterator == null) {
+            pagingIterator = pageSubscription.iterator(true);
+         }
+         return pagingIterator;
+      }
 
       Iterator lastIterator = null;
 
-      private TotalQueueIterator() {
-         if (pageSubscription != null) {
-            pageIter = pageSubscription.iterator();
-         }
+      MessageReference cachedNext = null;
+
+      private QueueBrowserIterator() {
          messagesIterator = new SynchronizedIterator(messageReferences.iterator());
       }
 
@@ -2916,9 +2922,9 @@ public class QueueImpl implements Queue {
             lastIterator = messagesIterator;
             return true;
          }
-         if (pageIter != null) {
-            if (pageIter.hasNext()) {
-               lastIterator = pageIter;
+         if (getPagingIterator() != null) {
+            if (getPagingIterator().hasNext()) {
+               lastIterator = getPagingIterator();
                return true;
             }
          }
@@ -2926,16 +2932,37 @@ public class QueueImpl implements Queue {
          return false;
       }
 
+
+
       @Override
       public MessageReference next() {
-         if (messagesIterator != null && messagesIterator.hasNext()) {
-            MessageReference msg = messagesIterator.next();
-            return msg;
+
+         if (cachedNext != null) {
+            try {
+               return cachedNext;
+            } finally {
+               cachedNext = null;
+            }
+
          }
-         if (pageIter != null) {
-            if (pageIter.hasNext()) {
-               lastIterator = pageIter;
-               return pageIter.next();
+         while (true) {
+            if (messagesIterator != null && messagesIterator.hasNext()) {
+               MessageReference msg = messagesIterator.next();
+               if (msg.isPaged()) {
+                  System.out.println("** Rejecting because it's paged " + msg.getMessage());
+                  continue;
+               }
+//               System.out.println("** Returning because it's not paged " + msg.getMessage());
+               return msg;
+            } else {
+               break;
+            }
+         }
+         if (getPagingIterator() != null) {
+            if (getPagingIterator().hasNext()) {
+               lastIterator = getPagingIterator();
+               MessageReference ref = getPagingIterator().next();
+               return ref;
             }
          }
 
@@ -2955,8 +2982,8 @@ public class QueueImpl implements Queue {
 
       @Override
       public void close() {
-         if (pageIter != null) {
-            pageIter.close();
+         if (getPagingIterator() != null) {
+            getPagingIterator().close();
          }
          if (messagesIterator != null) {
             messagesIterator.close();

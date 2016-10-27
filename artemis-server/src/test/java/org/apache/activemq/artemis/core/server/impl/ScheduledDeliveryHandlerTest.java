@@ -1165,7 +1165,7 @@ public class ScheduledDeliveryHandlerTest extends Assert {
       }
 
       @Override
-      public LinkedListIterator<MessageReference> totalIterator() {
+      public LinkedListIterator<MessageReference> browserIterator() {
          return null;
       }
 

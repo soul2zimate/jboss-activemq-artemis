@@ -309,7 +309,7 @@ public class PagingSendTest extends ActiveMQTestBase {
     * duplicates that may have happened before this point).
     */
    public void checkBatchMessagesAreNotPagedTwice(Queue queue) throws Exception {
-      LinkedListIterator<MessageReference> pageIterator = queue.totalIterator();
+      LinkedListIterator<MessageReference> pageIterator = queue.browserIterator();
 
       Set<String> messageOrderSet = new HashSet<String>();
 
@@ -345,7 +345,7 @@ public class PagingSendTest extends ActiveMQTestBase {
     * duplicates that may have happened before this point).
     */
    protected int processCountThroughIterator(Queue queue) throws Exception {
-      LinkedListIterator<MessageReference> pageIterator = queue.totalIterator();
+      LinkedListIterator<MessageReference> pageIterator = queue.browserIterator();
 
       int count = 0;
       while (pageIterator.hasNext()) {
