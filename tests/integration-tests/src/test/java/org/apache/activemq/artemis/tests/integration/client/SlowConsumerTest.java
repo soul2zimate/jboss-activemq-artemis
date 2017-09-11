@@ -89,7 +89,8 @@ public class SlowConsumerTest extends ActiveMQTestBase {
          addressSettings.setAddressFullMessagePolicy(AddressFullMessagePolicy.PAGE);
          addressSettings.setMaxSizeBytes(10 * 1024);
          addressSettings.setPageSizeBytes(1024);
-      } else {
+      }
+      else {
          addressSettings.setAddressFullMessagePolicy(AddressFullMessagePolicy.BLOCK);
          addressSettings.setMaxSizeBytes(-1);
          addressSettings.setPageSizeBytes(1024);
@@ -139,7 +140,8 @@ public class SlowConsumerTest extends ActiveMQTestBase {
       Queue queue = server.locateQueue(QUEUE);
       if (isPaging) {
          Assert.assertTrue(queue.getPageSubscription().isPaging());
-      } else {
+      }
+      else {
          Assert.assertFalse(queue.getPageSubscription().isPaging());
       }
    }
